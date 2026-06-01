@@ -1,31 +1,15 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
-	"github.com/gin-gonic/gin"
+	"github.com/adityadav2/eduflow-ai/backend/internal/server"
 )
 
-type HealthResponse struct {
-	Status  string `json:"status"`
-	Service string `json:"service"`
-}
-
-func healthHandler(c *gin.Context) {
-	response := HealthResponse{
-		Status:  "ok",
-		Service: "eduflow-api",
-	}
-
-	c.JSON(http.StatusOK, response)
-}
-
 func main() {
-	router := gin.Default()
-
-	router.GET("/health", healthHandler)
-
+	router := server.NewRouter()
+	log.Println("EduFlow API server started on port 8080")
 	if err := router.Run(":8080"); err != nil {
-		panic(err)
+		log.Fatal("server failed to start: ", err)
 	}
 }
