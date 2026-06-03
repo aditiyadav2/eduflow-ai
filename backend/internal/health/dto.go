@@ -1,6 +1,6 @@
 package health
 
 type Response struct {
-	Status  string `json:"Status"`
-	Service string `json:"Service"`
+	Status  string `json:"status"`
+	Service string `json:"service"`
 }
