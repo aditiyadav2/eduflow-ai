@@ -27,3 +27,6 @@ func NewMongoClient(mongoURI string) (*mongo.Client, error) {
 func PingMongo(ctx context.Context, client *mongo.Client) error {
 	return client.Ping(ctx, nil)
 }
+func GetDatabase(client *mongo.Client) *mongo.Database {
+	return client.Database("eduflow_ai")
+}
