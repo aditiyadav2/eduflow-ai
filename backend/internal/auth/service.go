@@ -67,3 +67,36 @@ func (s *Service) Register(
 		TenantID: user.TenantID,
 	}, nil
 }
+
+func (s *Service) Login(
+	ctx context.Context,
+	request LoginRequest,
+	secret string,
+) (*LoginResponse, error) {
+	user, err := s.repository.FindUserByEmail(
+		ctx,
+		request.Email,
+	)
+	if err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.PasswordHash),
+		[]byte(request.Password),
+	)
+	if err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+	token, err := GenerateToken(
+		*user,
+		secret,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &LoginResponse{
+		AccessToken: token,
+		TokenType:   "Bearer",
+		ExpiresIn:   24 * 3600,
+	}, nil
+}

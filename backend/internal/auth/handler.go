@@ -9,12 +9,14 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	service   *Service
+	jwtSecret string
 }
 
-func NewHandler(service *Service) *Handler {
+func NewHandler(service *Service, jwtSecret string) *Handler {
 	return &Handler{
-		service: service,
+		service:   service,
+		jwtSecret: jwtSecret,
 	}
 }
 
@@ -41,4 +43,29 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *Handler) Login(c *gin.Context) {
+	var request LoginRequest
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid request body",
+		})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	response, err := h.service.Login(ctx, request, h.jwtSecret)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
 }

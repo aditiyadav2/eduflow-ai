@@ -24,13 +24,14 @@ func NewRouter(mongoClient *mongo.Client) *gin.Engine {
 	// Auth module
 	authRepository := auth.NewRepository(db)
 	authService := auth.NewService(authRepository)
-	authHandler := auth.NewHandler(authService)
+	authHandler := auth.NewHandler(authService, "eduflow-secret-key")
 
 	api := router.Group("/api/v1")
 	{
 		authRoutes := api.Group("/auth")
 		{
 			authRoutes.POST("/register", authHandler.Register)
+			authRoutes.POST("/login", authHandler.Login)
 		}
 	}
 
