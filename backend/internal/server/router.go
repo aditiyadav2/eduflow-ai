@@ -6,6 +6,10 @@ import (
 	"github.com/adityadav2/eduflow-ai/backend/internal/health"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+
+	// middleware package intentionally not used here; remove import when adding middleware
+	"github.com/adityadav2/eduflow-ai/backend/internal/middleware"
+	"github.com/adityadav2/eduflow-ai/backend/internal/profile"
 )
 
 func NewRouter(mongoClient *mongo.Client) *gin.Engine {
@@ -34,6 +38,12 @@ func NewRouter(mongoClient *mongo.Client) *gin.Engine {
 			authRoutes.POST("/login", authHandler.Login)
 		}
 	}
+	protected := api.Group("")
+	protected.Use(middleware.AuthMiddleware("eduflow-secret-key"))
+	{
+		protected.GET("/profile", profile.GetProfile)
+	}
 
 	return router
+
 }
