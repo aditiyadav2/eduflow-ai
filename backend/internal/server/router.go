@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
 	// middleware package intentionally not used here; remove import when adding middleware
+	"github.com/adityadav2/eduflow-ai/backend/internal/admin"
 	"github.com/adityadav2/eduflow-ai/backend/internal/middleware"
 	"github.com/adityadav2/eduflow-ai/backend/internal/profile"
 )
@@ -42,6 +43,12 @@ func NewRouter(mongoClient *mongo.Client) *gin.Engine {
 	protected.Use(middleware.AuthMiddleware("eduflow-secret-key"))
 	{
 		protected.GET("/profile", profile.GetProfile)
+		adminRoutes := protected.Group("/admin")
+		adminRoutes.Use(middleware.RequireRole("admin"))
+		{
+			adminRoutes.GET("/dashboard", admin.Dashboard)
+		}
+
 	}
 
 	return router
